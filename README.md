@@ -1,5 +1,7 @@
 # Writer's Toolkit (WTK)
 
+![.NET Core](https://github.com/discorobot/wtk/workflows/.NET%20Core/badge.svg)
+
 This is a collection of tools designed to help writers who like to work with words the same way they work with source code.
 
 It works best when paired with a programmer's editor and source control.
