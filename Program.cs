@@ -7,7 +7,6 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 
 
-
 namespace wtk
 {
     class Program
@@ -19,7 +18,7 @@ namespace wtk
         {
             var rootOption = new Option("--root", "The location of the project folder. Defaults to current directory.")
             {
-                Argument = new Argument<string>(defaultValue: () => { return  Directory.GetCurrentDirectory();})
+                Argument = new Argument<string>(defaultValue: () => { return  Directory.GetCurrentDirectory().ToString();})
             };
 
             var verboseOption = new Option("--verbose", "wtk tries to be silent unless you're in verbose mode.")
@@ -27,7 +26,7 @@ namespace wtk
                 Argument = new Argument<bool>(defaultValue: () => false)
             };
 
-            var rootCommand = new RootCommand("A bunch of useful writer tools"){};
+            var rootCommand = new RootCommand("A bunch of useful writing tools"){};
             rootCommand.AddOption(rootOption);
             rootCommand.AddOption(verboseOption);
             rootCommand.AddCommand(Init());
@@ -40,6 +39,7 @@ namespace wtk
         {       
             var cmd = new Command("init", "Initialises a folder for use with gtk");
             cmd.Handler = CommandHandler.Create<string, bool>((root, verbose) => {
+                
                 Console.WriteLine("this is init");
                 Console.WriteLine($"Root is {root}");
                 Console.WriteLine($"Verbose is {verbose}");
@@ -50,10 +50,8 @@ namespace wtk
         private static Command Count()
         {
             var cmd = new Command("count", "Counts number of words in the manuscript");
-            cmd.Handler = CommandHandler.Create<string, bool>((root, verbose) => {
-                Console.WriteLine("this is count");
-                Console.WriteLine($"Root is {root}");
-                Console.WriteLine($"Verbose is {verbose}");
+            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>((root, verbose, context) => {
+                context.Console.Out.WriteLine("This was written out via context");                
             });
             return cmd;
         }
@@ -61,9 +59,7 @@ namespace wtk
         private static Command Status()
         {
             var cmd = new Command("status", "Checks the status of the project");
-            cmd.Handler = CommandHandler.Create<string, bool>((RootCommand, verbose) => {
-                Console.WriteLine("this is status");
-            });
+            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Status);
             return cmd;
         }
 
