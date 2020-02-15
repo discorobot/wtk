@@ -45,9 +45,7 @@ namespace wtk
         private static Command Count()
         {
             var cmd = new Command("count", "Counts number of words in the manuscript");
-            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>((root, verbose, context) => {
-                context.Console.Out.WriteLine("This was written out via context");                
-            });
+            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Count);
             return cmd;
         }
 
@@ -59,35 +57,7 @@ namespace wtk
         }
 
 
-        static void WordCount(string fileMask)
-        {
-            var startDir = Path.GetDirectoryName(fileMask);
-            var mask = Path.GetFileName(fileMask);
-            Console.WriteLine($"Original = {fileMask}");
-            Console.WriteLine($"StartDir = {startDir}");
-            Console.WriteLine($"fileMask = {mask}");
-
-            var di = new DirectoryInfo(startDir);
-            var files = di.GetFiles(mask, SearchOption.AllDirectories);
-            
-            var totalWordCount = 0;
-            foreach(var file in files)
-            {
-                int wordCount = CountWordsFromFile(file.FullName);
-                Console.WriteLine($"{wordCount}\t{file.FullName}");
-                totalWordCount = totalWordCount + wordCount;
-            }
-            Console.WriteLine($"Total word count {totalWordCount}");
-        }
-
-        static int CountWordsFromFile(string fileName)
-        {
-            return CountWords(File.ReadAllText(fileName));
-        }
-        static int CountWords(string s)
-        {
-            MatchCollection collection = Regex.Matches(s, @"[\S]+");
-            return collection.Count;
-        }
+        
+       
     }
 }
