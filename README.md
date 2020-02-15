@@ -43,8 +43,8 @@ SO:
 
 ### format and naming conventions
 - all text is written in Markdown. 
-- each section folder name has the form `section_NN`
-- each chapter folder name has the form `chapter_NN`. 
+- each section folder name has the form `section_NN`or `partNN`
+- each chapter folder name has the form `chapter_NN` or `chNN`. 
 - each scene file has the form `NN_(anything you want).md`. Any markdown file in a chapter folder that doesnt' start with two numbers and an underscore won't be considered part of the novel when counting words or compiling
 - `synopsis.md` is a special file that can exist in any chapter folder and includes a summary of what should happen in the chapter. The synopsis file can include any text, but also supports a few special codes (see below)
 

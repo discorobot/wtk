@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,6 +12,11 @@ namespace wtk
     {
         protected const string WTK_SYSTEM_DIR = ".wtk";
         protected const string MANUSCRIPT_DIR = "manuscript";
+
+        private const string REGEX_MANUSCRIPT_FILE_MATCH = @"\d\d.*[.]md";
+        private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
+        private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
+
         static public void Status(string root, bool verbose, InvocationContext context)
         {
             if (CheckInitialised(root, context))
@@ -56,16 +63,40 @@ namespace wtk
 
         public static void Count(string root, bool verbose, InvocationContext context)
         {
+            var allMetadata = GetAllMetadata(root);
+            var sorted = allMetadata.OrderBy(m => m.Part).ThenBy(m => m.Chapter);
+            foreach(var m in sorted)
+            {
+                context.Console.Out.Write($"{m}\n");    
+            }
+                        
+
+        }
+        static List<ManuscriptFileMetadata> GetAllMetadata(string root)
+        {
+            var result = new List<ManuscriptFileMetadata>();
             // we're going to count all files under manuscript (and subdirectories)
             var manuscriptDir = new DirectoryInfo(Path.Combine(root, MANUSCRIPT_DIR));
             // only looking for markdown files that start with a number
             var allFiles = manuscriptDir.GetFiles("*.md", SearchOption.AllDirectories);
-            var justManuscriptFiles = allFiles.SelectMany(f => Regex.Matches(f.Name, @"\d\d.*[.]md"));
-            foreach(var file in justManuscriptFiles)
+            
+            var justManuscriptFiles = allFiles.Where(f => Regex.IsMatch(f.Name,  REGEX_MANUSCRIPT_FILE_MATCH));
+            foreach(FileInfo file in justManuscriptFiles)
             {
-                context.Console.Out.Write($"{file}\n");
+                var metadata = GetMetadata(file.FullName);  
+                result.Add(metadata);  
             }
-
+            return result;
+        }
+        static ManuscriptFileMetadata GetMetadata(string pathAndFileName)
+        {
+            var chapter = GetChapterFromPath(pathAndFileName);
+            var part = GetPartFromPath(pathAndFileName);
+            return new ManuscriptFileMetadata{
+                FullPath = pathAndFileName,
+                Chapter = chapter,
+                Part = part
+            };
         }
 
 
@@ -79,6 +110,28 @@ namespace wtk
             return collection.Count;
         }
 
+        /// The chapter is the last occurence of chXX in the path
+        static int? GetChapterFromPath(string path)
+        {
+            var groups = Regex.Match(path, REGEX_CHAPTER_MATCH).Groups;
+            var result = groups.Values.LastOrDefault().Value;
+            return ToNullableInt(result);    
+        }
+
+        static int? GetPartFromPath(string path)
+        {
+            var groups = Regex.Match(path, REGEX_PART_MATCH).Groups;
+            var result = groups.Values.LastOrDefault().Value;
+            return ToNullableInt(result);
+        }
+
+        static int? ToNullableInt(string s)
+        {
+            int tempNumber;
+            return (int.TryParse(s.Trim(), out tempNumber) ? tempNumber as int? : null);
+        }
+
+        
         /*static void WordCount(string fileMask)
         {
             var startDir = Path.GetDirectoryName(fileMask);
