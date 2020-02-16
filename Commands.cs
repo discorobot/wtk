@@ -12,7 +12,6 @@ namespace wtk
     {
         protected const string WTK_SYSTEM_DIR = ".wtk";
         protected const string MANUSCRIPT_DIR = "manuscript";
-
         private const string REGEX_MANUSCRIPT_FILE_MATCH = @"\d\d.*[.]md";
         private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
         private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
@@ -61,20 +60,36 @@ namespace wtk
             }
         }
 
+        public static void CountByChapter(string root, bool verbose, InvocationContext context)
+        {
+            var allMetadata = GetAllMetadata(root);
+           
+            var chapters = from p in allMetadata
+            group p by new {p.Part, p.Chapter}
+            into grp
+            select new ChapterMetadata {Part = grp.Key.Part, 
+            Chapter = grp.Key.Chapter, Words = grp.Sum(p => p.Words)};
+            
+            var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter);
+
+            foreach(var c in sortedChapters)
+            {
+                context.Console.Out.Write($"part {c.Part} chapter {c.Chapter}\t{c.Words} words\n");
+            }
+
+            var wordcount = sortedChapters.Sum(m => m.Words);
+            context.Console.Out.Write($"Total {wordcount} words");
+            
+        }
         public static void Count(string root, bool verbose, InvocationContext context)
         {
             var allMetadata = GetAllMetadata(root);
-            var sorted = allMetadata.OrderBy(m => m.Part).ThenBy(m => m.Chapter);
-            foreach(var m in sorted)
-            {
-                context.Console.Out.Write($"{m}\n");    
-            }
-                        
-
+            var wordcount = allMetadata.Sum(m => m.Words);
+            context.Console.Out.Write($"{wordcount} words");
         }
-        static List<ManuscriptFileMetadata> GetAllMetadata(string root)
+        static List<PartFileMetadata> GetAllMetadata(string root)
         {
-            var result = new List<ManuscriptFileMetadata>();
+            var result = new List<PartFileMetadata>();
             // we're going to count all files under manuscript (and subdirectories)
             var manuscriptDir = new DirectoryInfo(Path.Combine(root, MANUSCRIPT_DIR));
             // only looking for markdown files that start with a number
@@ -83,34 +98,32 @@ namespace wtk
             var justManuscriptFiles = allFiles.Where(f => Regex.IsMatch(f.Name,  REGEX_MANUSCRIPT_FILE_MATCH));
             foreach(FileInfo file in justManuscriptFiles)
             {
-                var metadata = GetMetadata(file.FullName);  
+                var metadata = GetPartFileMetadata(file.FullName);  
                 result.Add(metadata);  
             }
             return result;
         }
-        static ManuscriptFileMetadata GetMetadata(string pathAndFileName)
+        static PartFileMetadata GetPartFileMetadata(string pathAndFileName)
         {
             var chapter = GetChapterFromPath(pathAndFileName);
             var part = GetPartFromPath(pathAndFileName);
-            return new ManuscriptFileMetadata{
+            var words = CountWordsFromFile(pathAndFileName);
+            return new PartFileMetadata{
                 FullPath = pathAndFileName,
                 Chapter = chapter,
-                Part = part
+                Part = part,
+                Words = words
             };
         }
 
 
         static int CountWordsFromFile(string fileName)
         {
-            return CountWords(File.ReadAllText(fileName));
-        }
-        static int CountWords(string s)
-        {
+            var s = File.ReadAllText(fileName);
             MatchCollection collection = Regex.Matches(s, @"[\S]+");
             return collection.Count;
         }
-
-        /// The chapter is the last occurence of chXX in the path
+        
         static int? GetChapterFromPath(string path)
         {
             var groups = Regex.Match(path, REGEX_CHAPTER_MATCH).Groups;
@@ -130,28 +143,6 @@ namespace wtk
             int tempNumber;
             return (int.TryParse(s.Trim(), out tempNumber) ? tempNumber as int? : null);
         }
-
-        
-        /*static void WordCount(string fileMask)
-        {
-            var startDir = Path.GetDirectoryName(fileMask);
-            var mask = Path.GetFileName(fileMask);
-            Console.WriteLine($"Original = {fileMask}");
-            Console.WriteLine($"StartDir = {startDir}");
-            Console.WriteLine($"fileMask = {mask}");
-
-            var di = new DirectoryInfo(startDir);
-            var files = di.GetFiles(mask, SearchOption.AllDirectories);
-            
-            var totalWordCount = 0;
-            foreach(var file in files)
-            {
-                int wordCount = CountWordsFromFile(file.FullName);
-                Console.WriteLine($"{wordCount}\t{file.FullName}");
-                totalWordCount = totalWordCount + wordCount;
-            }
-            Console.WriteLine($"Total word count {totalWordCount}");
-        }*/
 
     }
 

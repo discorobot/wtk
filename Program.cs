@@ -44,7 +44,11 @@ namespace wtk
 
         private static Command Count()
         {
+            Command byChapter = new Command ("ch", "Display word counts by chapter");
+            byChapter.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.CountByChapter);
+
             var cmd = new Command("count", "Counts number of words in the manuscript");
+            cmd.AddCommand(byChapter);
             cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Count);
             return cmd;
         }

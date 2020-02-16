@@ -59,11 +59,11 @@ SO:
 
 `wtk count` counts the total current number of words in the manuscript
 
-`wtk count -k` counts the total runmber of words and writes them to the keep file (`.wtk/wc`)
+`wtk count -k` counts the total number of words and writes them to the keep file (`.wtk/wc`)
 
-`wtk count -c` counts the total word count, broken down by chapters. 
+`wtk count ch` counts the total word count, broken down by chapters. 
 
-`wtk status` gives an overview of the current state of the project, based on word counts, planned word counts for each section and overall progress, including teh word count for the current session.
+`wtk status` gives an overview of the current state of the project, based on word counts, planned word counts for each section and overall progress, including the word count for the current session.
 
 `wtk compile`   Merges all sections and chapters into a single markdown file in the root directory.
 
@@ -79,3 +79,11 @@ Files in the `.wtk` folder include
 
 `yyyy-MM-dd'T'HH:mm:ss xxx yyyy-MM-dd'T'HH:mm:ss xxx'
 
+### Work in progress
+- [x] Implement init
+- [x] Implement count
+- [x] Implement count ch
+- [ ] Implement status
+- [ ] Implement session
+- [ ] Implement compile
+ 
