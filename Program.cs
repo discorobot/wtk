@@ -47,8 +47,12 @@ namespace wtk
             Command byChapter = new Command ("ch", "Display word counts by chapter");
             byChapter.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.CountByChapter);
 
+            Command keep = new Command("keep", "Counts number of words in the manuscript and stores the result in the keep file");
+            keep.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.CountKeep);
+
             var cmd = new Command("count", "Counts number of words in the manuscript");
             cmd.AddCommand(byChapter);
+            cmd.AddCommand(keep);
             cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Count);
             return cmd;
         }

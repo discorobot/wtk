@@ -11,6 +11,7 @@ namespace wtk
     public class Commands
     {
         protected const string WTK_SYSTEM_DIR = ".wtk";
+        protected const string WC_LOG_FILE = "wc.log";
         protected const string MANUSCRIPT_DIR = "manuscript";
         private const string REGEX_MANUSCRIPT_FILE_MATCH = @"\d\d.*[.]md";
         private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
@@ -78,14 +79,29 @@ namespace wtk
             }
 
             var wordcount = sortedChapters.Sum(m => m.Words);
-            context.Console.Out.Write($"Total {wordcount} words");
-            
+            context.Console.Out.Write($"Total {wordcount} words");   
         }
         public static void Count(string root, bool verbose, InvocationContext context)
         {
+            var wordcount = Count(root);
+            context.Console.Out.Write($"{wordcount} words");
+        }
+
+        public static void CountKeep(string root, bool verbose, InvocationContext context)
+        {
+            var wordcount = Count(root);
+            var fullPath = Path.Combine(root, WTK_SYSTEM_DIR, WC_LOG_FILE);
+            var timestamp = DateTime.Now.ToString("O");
+            var lineToWrite = $"{timestamp}\t{wordcount}\n";
+            File.AppendAllText(fullPath, lineToWrite);
+            context.Console.Out.Write($"{wordcount} words");
+        }
+
+        private static int Count(string root)
+        {
             var allMetadata = GetAllMetadata(root);
             var wordcount = allMetadata.Sum(m => m.Words);
-            context.Console.Out.Write($"{wordcount} words");
+            return wordcount;
         }
         static List<PartFileMetadata> GetAllMetadata(string root)
         {

@@ -59,7 +59,7 @@ SO:
 
 `wtk count` counts the total current number of words in the manuscript
 
-`wtk count -k` counts the total number of words and writes them to the keep file (`.wtk/wc`)
+`wtk count keep` counts the total number of words and writes them to the keep file (`.wtk/wc`)
 
 `wtk count ch` counts the total word count, broken down by chapters. 
 
@@ -83,6 +83,7 @@ Files in the `.wtk` folder include
 - [x] Implement init
 - [x] Implement count
 - [x] Implement count ch
+- [x] Implement count keep
 - [ ] Implement status
 - [ ] Implement session
 - [ ] Implement compile
