@@ -9,44 +9,24 @@ using System.CommandLine.Invocation;
 namespace wtk
 {
     public class Commands
-    {
-        protected const string WTK_SYSTEM_DIR = ".wtk";
-        protected const string WC_LOG_FILE = "wc.log";
-        protected const string MANUSCRIPT_DIR = "manuscript";
+    {        
         private const string REGEX_MANUSCRIPT_FILE_MATCH = @"\d\d.*[.]md";
         private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
         private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
 
         static public void Status(string root, bool verbose, InvocationContext context)
         {
-            if (CheckInitialised(root, context))
+            if (System.CheckInitialised(root, context))
             {
                 context.ResultCode = (int)ExitCode.Success;
                 context.Console.Out.Write("this is a wtk folder");
             }
         }
-
-        private static bool IsInitialised(string root)
-        {
-            var rootDir = new DirectoryInfo(root);
-            var hasWtkDir = rootDir.GetDirectories(WTK_SYSTEM_DIR, SearchOption.TopDirectoryOnly).Length == 1;
-            return hasWtkDir;
-        }
-        private static bool CheckInitialised(string root, InvocationContext context)
-        {
-            bool result = true;
-            if (!IsInitialised(root))
-            {
-                context.Console.Error.Write(".wtk folder not found. Did you wtk init?\n");
-                context.ResultCode = (int)ExitCode.NotInitialised;
-                result = false;
-            }
-            return result;
-        }
+      
 
         public static void Init(string root, bool verbose, InvocationContext context)
         {
-            var isInitialised = IsInitialised(root);
+            var isInitialised = System.IsInitialised(root);
             if (isInitialised)
             {
                 context.Console.Error.Write("folder already initialised");
@@ -55,8 +35,8 @@ namespace wtk
             else
             {
                 var rootDir = new DirectoryInfo(root);
-                rootDir.CreateSubdirectory(WTK_SYSTEM_DIR);
-                rootDir.CreateSubdirectory(MANUSCRIPT_DIR);
+                rootDir.CreateSubdirectory(System.WTK_SYSTEM_DIR);
+                rootDir.CreateSubdirectory(System.MANUSCRIPT_DIR);
                 context.Console.Out.Write("folder initialised");
             }
         }
@@ -90,7 +70,7 @@ namespace wtk
         public static void CountKeep(string root, bool verbose, InvocationContext context)
         {
             var wordcount = Count(root);
-            var fullPath = Path.Combine(root, WTK_SYSTEM_DIR, WC_LOG_FILE);
+            var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
             var timestamp = DateTime.Now.ToString("O");
             var lineToWrite = $"{timestamp}\t{wordcount}\n";
             File.AppendAllText(fullPath, lineToWrite);
@@ -107,7 +87,7 @@ namespace wtk
         {
             var result = new List<PartFileMetadata>();
             // we're going to count all files under manuscript (and subdirectories)
-            var manuscriptDir = new DirectoryInfo(Path.Combine(root, MANUSCRIPT_DIR));
+            var manuscriptDir = new DirectoryInfo(Path.Combine(root, System.MANUSCRIPT_DIR));
             // only looking for markdown files that start with a number
             var allFiles = manuscriptDir.GetFiles("*.md", SearchOption.AllDirectories);
             

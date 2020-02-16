@@ -32,6 +32,7 @@ namespace wtk
             rootCommand.AddCommand(Init());
             rootCommand.AddCommand(Count());
             rootCommand.AddCommand(Status());
+            rootCommand.AddCommand(Config());
             return rootCommand.InvokeAsync(args).Result;
         }
 
@@ -61,6 +62,17 @@ namespace wtk
         {
             var cmd = new Command("status", "Checks the status of the project");
             cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Status);
+            return cmd;
+        }
+
+        private static Command Config()
+        {
+            Command list = new Command("list", "Displays all configuration entries");
+            list.Handler = CommandHandler.Create<string, bool, InvocationContext>(Configuration.List);
+
+            var cmd = new Command("config", "Reads and writes configuration entries");
+            cmd.AddCommand(list);
+            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Configuration.List);
             return cmd;
         }
 

@@ -49,7 +49,7 @@ SO:
 - `synopsis.md` is a special file that can exist in any chapter folder and includes a summary of what should happen in the chapter. The synopsis file can include any text, but also supports a few special codes (see below)
 
 
-# WTK command line
+# WTK commands
 
 `wtk init` sets the current directory as the top level of a wtk project. It will create a .wtk folder if one doesn't already exist
 
@@ -67,17 +67,24 @@ SO:
 
 `wtk compile`   Merges all sections and chapters into a single markdown file in the root directory.
 
+`wtk publish`   Convert your manuscript into another format (such as .docx)
+
+`wtk config` Set configuration values
+
+# Publiahing
+You can publish to other formats (including .docx and ebook formats) with [Pandoc](https://pandoc.org/index.html). This requires a couple of configuration entries to be set up: `publish.pandoc.path` and `publish.pandoc.outputformat`
+
+
 # The .wtk folder
 This is generated at the top level of a wtk project and contains various system and history files. You shouldn't need to touch this. You should ensure it's committed to source control.
 
 Files in the `.wtk` folder include
-- `wc.log` A log of all word counts run with the`-k` (keep) parameter. Log entries include a date and count.
+- `wc.log` A log of all word counts run with the`-k` (keep) parameter. Log entries include a date and count in the format `yyyy-MM-dd'T'HH:mm:ss xxx`
 
-`yyyy-MM-dd'T'HH:mm:ss xxx`
+- `session` A file containing state of the current session: Time started (and the wordcount when the session started), time ended and the final wordcount in the format 
+`yyyy-MM-dd'T'HH:mm:ss xxx yyyy-MM-dd'T'HH:mm:ss xxx`
 
-- `session` A file containing state of the current session: Time started (and the wordcount when the session started), time ended and the final wordcount.
-
-`yyyy-MM-dd'T'HH:mm:ss xxx yyyy-MM-dd'T'HH:mm:ss xxx'
+- `config.json` The configuration file
 
 ### Work in progress
 - [x] Implement init
@@ -87,4 +94,5 @@ Files in the `.wtk` folder include
 - [ ] Implement status
 - [ ] Implement session
 - [ ] Implement compile
+- [ ] Implement convert to Word (or other formats)
  
