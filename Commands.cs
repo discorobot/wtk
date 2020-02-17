@@ -37,44 +37,55 @@ namespace wtk
                 var rootDir = new DirectoryInfo(root);
                 rootDir.CreateSubdirectory(System.WTK_SYSTEM_DIR);
                 rootDir.CreateSubdirectory(System.MANUSCRIPT_DIR);
+                Configuration.InitialiseConfigFileIfMissing(root);
                 context.Console.Out.Write("folder initialised");
             }
         }
 
         public static void CountByChapter(string root, bool verbose, InvocationContext context)
         {
-            var allMetadata = GetAllMetadata(root);
-           
-            var chapters = from p in allMetadata
-            group p by new {p.Part, p.Chapter}
-            into grp
-            select new ChapterMetadata {Part = grp.Key.Part, 
-            Chapter = grp.Key.Chapter, Words = grp.Sum(p => p.Words)};
-            
-            var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter);
-
-            foreach(var c in sortedChapters)
+            var isInitialised = System.CheckInitialised(root, context);
+            if (isInitialised)
             {
-                context.Console.Out.Write($"part {c.Part} chapter {c.Chapter}\t{c.Words} words\n");
-            }
+                var allMetadata = GetAllMetadata(root);
+                var chapters = from p in allMetadata
+                    group p by new {p.Part, p.Chapter}
+                    into grp
+                    select new ChapterMetadata {Part = grp.Key.Part, 
+                Chapter = grp.Key.Chapter, Words = grp.Sum(p => p.Words)};
+                var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter);
 
-            var wordcount = sortedChapters.Sum(m => m.Words);
-            context.Console.Out.Write($"Total {wordcount} words");   
+                foreach(var c in sortedChapters)
+                {
+                    context.Console.Out.Write($"part {c.Part} chapter {c.Chapter}\t{c.Words} words\n");
+                }
+
+                var wordcount = sortedChapters.Sum(m => m.Words);
+                context.Console.Out.Write($"Total {wordcount} words");   
+            }
         }
         public static void Count(string root, bool verbose, InvocationContext context)
         {
-            var wordcount = Count(root);
-            context.Console.Out.Write($"{wordcount} words");
+            var isInitialised = System.CheckInitialised(root, context);
+            if (isInitialised)
+            {
+                var wordcount = Count(root);
+                context.Console.Out.Write($"{wordcount} words");
+            }
         }
 
         public static void CountKeep(string root, bool verbose, InvocationContext context)
         {
-            var wordcount = Count(root);
-            var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
-            var timestamp = DateTime.Now.ToString("O");
-            var lineToWrite = $"{timestamp}\t{wordcount}\n";
-            File.AppendAllText(fullPath, lineToWrite);
-            context.Console.Out.Write($"{wordcount} words");
+            var isInitialised = System.CheckInitialised(root, context);
+            if (isInitialised)
+            {
+                var wordcount = Count(root);
+                var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
+                var timestamp = DateTime.Now.ToString("O");
+                var lineToWrite = $"{timestamp}\t{wordcount}\n";
+                File.AppendAllText(fullPath, lineToWrite);
+                context.Console.Out.Write($"{wordcount} words");
+            }
         }
 
         private static int Count(string root)
@@ -83,7 +94,7 @@ namespace wtk
             var wordcount = allMetadata.Sum(m => m.Words);
             return wordcount;
         }
-        static List<PartFileMetadata> GetAllMetadata(string root)
+        private static List<PartFileMetadata> GetAllMetadata(string root)
         {
             var result = new List<PartFileMetadata>();
             // we're going to count all files under manuscript (and subdirectories)
@@ -99,7 +110,7 @@ namespace wtk
             }
             return result;
         }
-        static PartFileMetadata GetPartFileMetadata(string pathAndFileName)
+        private static PartFileMetadata GetPartFileMetadata(string pathAndFileName)
         {
             var chapter = GetChapterFromPath(pathAndFileName);
             var part = GetPartFromPath(pathAndFileName);
@@ -113,28 +124,28 @@ namespace wtk
         }
 
 
-        static int CountWordsFromFile(string fileName)
+        private static int CountWordsFromFile(string fileName)
         {
             var s = File.ReadAllText(fileName);
             MatchCollection collection = Regex.Matches(s, @"[\S]+");
             return collection.Count;
         }
         
-        static int? GetChapterFromPath(string path)
+        private static int? GetChapterFromPath(string path)
         {
             var groups = Regex.Match(path, REGEX_CHAPTER_MATCH).Groups;
             var result = groups.Values.LastOrDefault().Value;
             return ToNullableInt(result);    
         }
 
-        static int? GetPartFromPath(string path)
+        private static int? GetPartFromPath(string path)
         {
             var groups = Regex.Match(path, REGEX_PART_MATCH).Groups;
             var result = groups.Values.LastOrDefault().Value;
             return ToNullableInt(result);
         }
 
-        static int? ToNullableInt(string s)
+        private static int? ToNullableInt(string s)
         {
             int tempNumber;
             return (int.TryParse(s.Trim(), out tempNumber) ? tempNumber as int? : null);
