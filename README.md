@@ -71,7 +71,7 @@ SO:
 
 `wtk config` Set configuration values
 
-# Publiahing
+# Publishing
 You can publish to other formats (including .docx and ebook formats) with [Pandoc](https://pandoc.org/index.html). This requires a couple of configuration entries to be set up: `publish.pandoc.path` and `publish.pandoc.outputformat`
 
 
@@ -91,8 +91,13 @@ Files in the `.wtk` folder include
 - [x] Implement count
 - [x] Implement count ch
 - [x] Implement count keep
+- [x] Implement config list
 - [ ] Implement status
 - [ ] Implement session
-- [ ] Implement compile
+- [x] Implement compile
 - [ ] Implement convert to Word (or other formats)
+- [ ] Unit tests
+- [ ] Integration tests
+- [x] Github build
+ 
  

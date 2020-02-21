@@ -10,6 +10,21 @@ namespace wtk
         {
 
         }
+
+        public static ConfigurationFile LoadConfiguration(string root, InvocationContext context)
+        {
+            if (System.CheckInitialised(root, context))
+            {   
+                var configFilePath = Path.Combine(root, System.WTK_SYSTEM_DIR, CONFIG_FILE);
+                var fileContents = File.ReadAllText(configFilePath);
+                var configurationFile = (ConfigurationFile) JsonSerializer.Deserialize(fileContents, typeof(ConfigurationFile));   
+                return configurationFile;
+            }
+            else
+            {
+                return null;
+            }
+        }
         public static void List(string root, bool verbose, InvocationContext context)
         {
             if (System.CheckInitialised(root, context))
@@ -32,7 +47,15 @@ namespace wtk
 
         private static void InitialiseConfigFile(string path)
         {
-            ConfigurationFile configurationFile = new ConfigurationFile {Publish = new Publish {OutputFormat = ".docx", PandocPath = "unknown"}} ;
+            ConfigurationFile configurationFile = new ConfigurationFile {
+                Compile = new Compile {
+                    SectionBreak = "# Section {0}",
+                    ChapterBreak = "## Chapter {0}",
+                    PartBreak = "\n\n\n\n"
+                },
+                Publish = new Publish {
+                    OutputFormat = ".docx",
+                     PandocPath = "unknown"}} ;
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,

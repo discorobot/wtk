@@ -31,6 +31,7 @@ namespace wtk
             rootCommand.AddOption(verboseOption);
             rootCommand.AddCommand(Init());
             rootCommand.AddCommand(Count());
+            rootCommand.AddCommand(Compile());
             rootCommand.AddCommand(Status());
             rootCommand.AddCommand(Config());
             return rootCommand.InvokeAsync(args).Result;
@@ -65,6 +66,12 @@ namespace wtk
             return cmd;
         }
 
+        private static Command Compile()
+        {
+            var cmd = new Command("compile", "Merge all chapters into a single document");
+            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Compile);
+            return cmd; 
+        }
         private static Command Config()
         {
             Command list = new Command("list", "Displays all configuration entries");

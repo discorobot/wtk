@@ -14,6 +14,8 @@ namespace wtk
         private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
         private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
 
+        private const string COMPILE_OUTPUT_NAME = "manuscript.md";
+
         static public void Status(string root, bool verbose, InvocationContext context)
         {
             if (System.CheckInitialised(root, context))
@@ -88,6 +90,39 @@ namespace wtk
             }
         }
 
+        public static void Compile(string root, bool verbose, InvocationContext context)
+        {
+            var isInitialised = System.CheckInitialised(root, context);
+            if (isInitialised)
+            {
+                var configurationFile = Configuration.LoadConfiguration(root, context);
+                var outputPath = Path.Combine(root, COMPILE_OUTPUT_NAME);
+                var currentSection = 0;
+                var currentChapter = 0;
+                var metadata = GetAllMetadata(root);
+                
+                using (StreamWriter outputFile = new StreamWriter(outputPath))
+                {
+                    foreach (var md in metadata)
+                    {
+                        if (md.Part != currentSection)
+                        {
+                            outputFile.WriteLine(string.Format(configurationFile.Compile.SectionBreak, md.Part));
+                            currentSection = md.Part.Value;
+                        }
+                        if (md.Chapter != currentChapter)
+                        {
+                            outputFile.WriteLine(string.Format(configurationFile.Compile.ChapterBreak, md.Chapter));
+                            currentChapter = md.Chapter.Value;
+                        }   
+                        var fileContents = LoadFileContents(md.FullPath);
+                        outputFile.Write(fileContents);
+                        outputFile.Write(configurationFile.Compile.PartBreak);
+                    }
+                }
+            }
+        }
+
         private static int Count(string root)
         {
             var allMetadata = GetAllMetadata(root);
@@ -126,9 +161,15 @@ namespace wtk
 
         private static int CountWordsFromFile(string fileName)
         {
-            var s = File.ReadAllText(fileName);
+            var s = LoadFileContents(fileName);
             MatchCollection collection = Regex.Matches(s, @"[\S]+");
             return collection.Count;
+        }
+
+        private static string LoadFileContents(string fileName)
+        {
+            var s = File.ReadAllText(fileName);
+            return s;
         }
         
         private static int? GetChapterFromPath(string path)
