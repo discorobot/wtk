@@ -53,26 +53,35 @@ SO:
 
 `wtk init` sets the current directory as the top level of a wtk project. It will create a .wtk folder if one doesn't already exist
 
-`wtk session start` Starts a writing session. This lets you track word counts and writing times for a particular period.
-
-`wtk session stop` Stops the current writing session. A session automatically stops at the end of the day.
+`wtk checkpoint` Records theStarts a writing session. This lets you track word counts and writing times for a particular period.
 
 `wtk count` counts the total current number of words in the manuscript
 
 `wtk count keep` counts the total number of words and writes them to the keep file (`.wtk/wc`)
 
-`wtk count ch` counts the total word count, broken down by chapters. 
-
 `wtk status` gives an overview of the current state of the project, based on word counts, planned word counts for each section and overall progress, including the word count for the current session.
 
 `wtk compile`   Merges all sections and chapters into a single markdown file in the root directory.
 
-`wtk publish`   Convert your manuscript into another format (such as .docx)
-
 `wtk config` Set configuration values
 
+# Compiling
+All parts of all chapters are rolled up into a single file. 
+
+Separators are added between sections, parts and chapters. The default values are:
+
+`"SectionBreak": "# Section {0}"`
+
+`"ChapterBreak": "## Chapter {0}"`
+
+`"PartBreak": "\n\n\n\n"`
+
+
 # Publishing
-You can publish to other formats (including .docx and ebook formats) with [Pandoc](https://pandoc.org/index.html). This requires a couple of configuration entries to be set up: `publish.pandoc.path` and `publish.pandoc.outputformat`
+You can convert the compiled Markdown file to other formats (including .docx and ebook formats) with [Pandoc](https://pandoc.org/index.html). For example `pandoc '\temp\manuscript.md' -o 'manuscript.docx'`.
+
+I haven't tried it yet, but setting section or chapter break values to `\newpage` [should work](https://stackoverflow.com/questions/16965490/pandoc-markdown-page-break)
+
 
 
 # The .wtk folder
@@ -80,9 +89,6 @@ This is generated at the top level of a wtk project and contains various system 
 
 Files in the `.wtk` folder include
 - `wc.log` A log of all word counts run with the`-k` (keep) parameter. Log entries include a date and count in the format `yyyy-MM-dd'T'HH:mm:ss xxx`
-
-- `session` A file containing state of the current session: Time started (and the wordcount when the session started), time ended and the final wordcount in the format 
-`yyyy-MM-dd'T'HH:mm:ss xxx yyyy-MM-dd'T'HH:mm:ss xxx`
 
 - `config.json` The configuration file
 
@@ -92,12 +98,8 @@ Files in the `.wtk` folder include
 - [x] Implement count ch
 - [x] Implement count keep
 - [x] Implement config list
-- [ ] Implement status
-- [ ] Implement session
+- [x] Implement status
 - [x] Implement compile
-- [ ] Implement convert to Word (or other formats)
-- [ ] Unit tests
-- [ ] Integration tests
 - [x] Github build
- 
+- [ ] Create build artifacts 
  

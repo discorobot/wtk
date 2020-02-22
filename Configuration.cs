@@ -52,10 +52,7 @@ namespace wtk
                     SectionBreak = "# Section {0}",
                     ChapterBreak = "## Chapter {0}",
                     PartBreak = "\n\n\n\n"
-                },
-                Publish = new Publish {
-                    OutputFormat = ".docx",
-                     PandocPath = "unknown"}} ;
+                }};
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
