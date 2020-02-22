@@ -13,15 +13,17 @@ namespace wtk
         private const string REGEX_MANUSCRIPT_FILE_MATCH = @"\d\d.*[.]md";
         private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
         private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
-
         private const string COMPILE_OUTPUT_NAME = "manuscript.md";
 
         static public void Status(string root, bool verbose, InvocationContext context)
         {
             if (System.CheckInitialised(root, context))
             {
+                // get word count by chapter
+                // get last 10 lines of the keep log
+                CountByChapter(root, verbose, context);
+                LastEntriesFromKeepFile(root, verbose, context);
                 context.ResultCode = (int)ExitCode.Success;
-                context.Console.Out.Write("this is a wtk folder");
             }
         }
       
@@ -63,7 +65,7 @@ namespace wtk
                 }
 
                 var wordcount = sortedChapters.Sum(m => m.Words);
-                context.Console.Out.Write($"Total {wordcount} words");   
+                context.Console.Out.Write($"Total {wordcount} words\n\n");   
             }
         }
         public static void Count(string root, bool verbose, InvocationContext context)
@@ -90,6 +92,18 @@ namespace wtk
             }
         }
 
+        private static void LastEntriesFromKeepFile(string root, bool verbose, InvocationContext context)
+        {
+            
+            var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
+            var keepEntries = File.ReadAllLines(fullPath);
+            var lastTen = keepEntries.Skip(Math.Max(0, keepEntries.Count() - 10));
+            foreach (var s in lastTen)
+            {
+                context.Console.Out.Write($"{s}\n");
+            }
+        }
+        
         public static void Compile(string root, bool verbose, InvocationContext context)
         {
             var isInitialised = System.CheckInitialised(root, context);
