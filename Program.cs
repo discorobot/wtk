@@ -33,6 +33,7 @@ namespace wtk
             rootCommand.AddCommand(Count());
             rootCommand.AddCommand(Compile());
             rootCommand.AddCommand(Status());
+            rootCommand.AddCommand(Todo());
             rootCommand.AddCommand(Config());
             return rootCommand.InvokeAsync(args).Result;
         }
@@ -63,6 +64,13 @@ namespace wtk
         {
             var cmd = new Command("status", "Checks the status of the project");
             cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Status);
+            return cmd;
+        }
+
+        private static Command Todo()
+        {
+            var cmd = new Command("todo", "Displays all TODO items in the projrct");
+            cmd.Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Todo);
             return cmd;
         }
 

@@ -137,6 +137,45 @@ namespace wtk
             }
         }
 
+        public static void Todo(string root, bool vebose, InvocationContext context)
+        {
+             var isInitialised = System.CheckInitialised(root, context);
+            if (isInitialised)
+            {
+                var allMetadata = GetAllTodoItems(root);
+                var chapters = from p in allMetadata
+                    group p by new {p.Part, p.Chapter}
+                    into grp
+                    select new ChapterMetadata {Part = grp.Key.Part, 
+                Chapter = grp.Key.Chapter, TodoItems = grp.SelectMany(p => p.TodoItems).ToList()};
+                var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter);
+
+                foreach(var c in sortedChapters)
+                {
+                    if (c.TodoItems.Count > 0)
+                    {
+                        if(c.Part != null)
+                        {
+                            context.Console.Out.Write($"part {c.Part} "); 
+                        }
+                        if (c.Chapter != null)
+                        {
+                            context.Console.Out.Write($"chapter {c.Chapter}"); 
+                        }
+                        if (c.Part != null || c.Chapter != null)
+                        {
+                            context.Console.Out.Write("\n");
+                        }
+                        
+                        foreach(var todo in c.TodoItems)
+                        {
+                            context.Console.Out.Write($"\t{todo}\n");
+                        }
+                    }
+                }
+            }
+        }
+
         private static int Count(string root)
         {
             var allMetadata = GetAllMetadata(root);
@@ -159,6 +198,23 @@ namespace wtk
             }
             return result;
         }
+
+        private static List<PartFileMetadata> GetAllTodoItems(string root)
+        {
+            var result = new List<PartFileMetadata>();
+            // we're going to count all files under manuscript (and subdirectories)
+            var manuscriptDir = new DirectoryInfo(Path.Combine(root, System.MANUSCRIPT_DIR));
+            // only looking for markdown files 
+            var allFiles = manuscriptDir.GetFiles("*.md", SearchOption.AllDirectories);
+            foreach(FileInfo file in allFiles)
+            {
+                var metadata = GetPartFileTodoItems(file.FullName);  
+                result.Add(metadata);  
+            }
+            return result;
+        }
+
+
         private static PartFileMetadata GetPartFileMetadata(string pathAndFileName)
         {
             var chapter = GetChapterFromPath(pathAndFileName);
@@ -172,7 +228,25 @@ namespace wtk
             };
         }
 
+        private static PartFileMetadata GetPartFileTodoItems(string pathAndFileName)
+        {
+            var chapter = GetChapterFromPath(pathAndFileName);
+            var part = GetPartFromPath(pathAndFileName);
+            var todoItems = GetTodoItemsFromFile(pathAndFileName);
+            return new PartFileMetadata {
+                FullPath = pathAndFileName,
+                Chapter = chapter,
+                Part = part,
+                TodoItems = todoItems
+            };
+        }
 
+        private static List<String> GetTodoItemsFromFile(string pathAndFileName)
+        {
+            var contents = File.ReadAllLines(pathAndFileName);
+            var todoLines = contents.Where(line => line.Contains("TODO"));
+            return todoLines.ToList();
+        }
         private static int CountWordsFromFile(string fileName)
         {
             var s = LoadFileContents(fileName);

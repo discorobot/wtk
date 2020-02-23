@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace wtk
 {
     public class PartFileMetadata {
@@ -5,6 +7,8 @@ namespace wtk
         public int? Chapter {get;set;}
         public int? Part {get;set;}
         public int Words {get;set;}
+
+        public List<string> TodoItems {get;set;}
 
         public override string ToString(){
             return $"part {Part} chapter {Chapter} words {Words} FullPath {FullPath}";
@@ -16,5 +20,7 @@ namespace wtk
         public int? Part {get;set;}
        public int? Chapter {get;set;}
         public int Words {get;set;}
+
+        public List<string> TodoItems {get;set;}
     }
 }

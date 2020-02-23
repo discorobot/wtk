@@ -61,6 +61,8 @@ SO:
 
 `wtk status` gives an overview of the current state of the project, based on word counts, planned word counts for each section and overall progress, including the word count for the current session.
 
+`wtk todo` lists all TODO items in all files under the manuscript folder. Note that this includes files that don't conform to the section/chapter/part naming convention, so if you have other files such as `synopsis` your todo items will stil be picked up.
+
 `wtk compile`   Merges all sections and chapters into a single markdown file in the root directory.
 
 `wtk config` Set configuration values
@@ -99,6 +101,7 @@ Files in the `.wtk` folder include
 - [x] Implement count keep
 - [x] Implement config list
 - [x] Implement status
+- [ ] Implement todo
 - [x] Implement compile
 - [x] Github build
 - [ ] Create build artifacts 
