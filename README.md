@@ -101,7 +101,7 @@ Files in the `.wtk` folder include
 - [x] Implement count keep
 - [x] Implement config list
 - [x] Implement status
-- [ ] Implement todo
+- [x] Implement todo
 - [x] Implement compile
 - [x] Github build
 - [ ] Create build artifacts 
