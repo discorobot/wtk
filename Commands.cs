@@ -96,11 +96,14 @@ namespace wtk
         {
             
             var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
-            var keepEntries = File.ReadAllLines(fullPath);
-            var lastTen = keepEntries.Skip(Math.Max(0, keepEntries.Count() - 10));
-            foreach (var s in lastTen)
+            if (File.Exists(fullPath))
             {
-                context.Console.Out.Write($"{s}\n");
+                var keepEntries = File.ReadAllLines(fullPath);
+                var lastTen = keepEntries.Skip(Math.Max(0, keepEntries.Count() - 10));
+                foreach (var s in lastTen)
+                {
+                    context.Console.Out.Write($"{s}\n");
+                }
             }
         }
         
