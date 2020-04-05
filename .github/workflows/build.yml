@@ -21,7 +21,7 @@ jobs:
         name: published_windows
         path: bin/Release/netcoreapp3.0/win-x64/publish/
     - name: Build for Linux
-      run: /mnt/c/dev_experiments/wtk$ dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
+      run: dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
     - name: Publish for Linux
       uses: actions/upload-artifact@v1.0.0
       with:
