@@ -16,7 +16,8 @@ jobs:
     - name: Build with dotnet
       run: dotnet build --configuration Release
     - name: Publish
+      run: dotnet publish --self-contained --runtime win-x64
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: published_test
-        path: bin\Release\Publish
+        name: published_windows
+        path: bin\Release\netcoreapp3.0\win-x64\publish
