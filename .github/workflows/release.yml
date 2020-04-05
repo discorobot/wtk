@@ -1,0 +1,44 @@
+on:
+    push:
+      # Sequence of patterns matched against refs/tags
+      tags:
+        - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  
+  name: Create Release  
+  jobs:
+    release:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - name: Setup .NET Core
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version: 3.0.101
+        - name: Build for Windows
+          run: dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true
+        - name: Publish for Windows
+          uses: actions/upload-artifact@v1.0.0
+          with:
+            name: published_windows
+            path: bin/Release/netcoreapp3.0/win-x64/publish/
+        - name: Build for Linux
+          run: dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimmed=true           
+        - name: Publish for Linux
+          uses: actions/upload-artifact@v1.0.0
+          with:
+            name: published_linux
+            path: bin/Release/netcoreapp3.0/linux-x64/        
+        - name: Create Release
+          id: create_release
+          uses: actions/create-release@latest
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          with:
+            tag_name: ${{ github.ref }}
+            release_name: Release ${{ github.ref }}
+            body: |
+              Changes in this Release
+              - First Change
+              - Second Change
+            draft: true
+            prerelease: true
