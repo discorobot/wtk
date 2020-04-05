@@ -15,3 +15,8 @@ jobs:
         dotnet-version: 3.0.101
     - name: Build with dotnet
       run: dotnet build --configuration Release
+    - name: Publish
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: published_test
+        path: bin\Release\Publish
