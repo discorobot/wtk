@@ -104,5 +104,6 @@ Files in the `.wtk` folder include
 - [x] Implement todo
 - [x] Implement compile
 - [x] Github build
-- [ ] Create build artifacts 
+- [x] Create build artifacts 
+- [ ] Create releases
  
