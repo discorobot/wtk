@@ -14,9 +14,8 @@ jobs:
       with:
         dotnet-version: 3.0.101
     - name: Build with dotnet
-      run: dotnet build --configuration Release
+      run: dotnet publish --configuration Release --self-contained --runtime win-x64
     - name: Publish
-      run: dotnet publish --self-contained --runtime win-x64
       uses: actions/upload-artifact@v1.0.0
       with:
         name: published_windows
