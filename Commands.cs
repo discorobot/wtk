@@ -19,7 +19,7 @@ namespace wtk
 
         private const string CONTROL_SYNOPSIS = "SYNOPSIS";
 
-        private const string TARGET_WORDCOUNT = "TARGET_WORDCOUNT"; s
+        private const string TARGET_WORDCOUNT = "TARGET_WORDCOUNT"; 
 
         static public void Status(string root, bool verbose, InvocationContext context)
         {

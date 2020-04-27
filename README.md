@@ -54,8 +54,6 @@ Several special lines are supported. These can be displayed in summaries (or oth
 - `SYNOPSIS` Gives a one-line synopsis of this chapter which will display when calling `status`
 - `TARGET_WORDCOUNT`Sets a target wordcount. This will be displayed with the actual wordcount when calling `status`
 
-
- s
 # WTK commands
 
 `wtk init` sets the current directory as the top level of a wtk project. It will create a .wtk folder if one doesn't already exist
