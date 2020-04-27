@@ -17,7 +17,7 @@ namespace wtk
 
     public class ChapterMetadata 
     {
-        public int? Part {get;set;}
+        public int? Part {get;set;} 
        public int? Chapter {get;set;}
         public int Words {get;set;}
         public int TargetWords {get;set;}
