@@ -15,6 +15,12 @@ namespace wtk
         private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
         private const string COMPILE_OUTPUT_NAME = "manuscript.md";
 
+        private const string CONTROL_TODO = "TODO";
+
+        private const string CONTROL_SYNOPSIS = "SYNOPSIS";
+
+        private const string TARGET_WORDCOUNT = "TARGET_WORDCOUNT";
+
         static public void Status(string root, bool verbose, InvocationContext context)
         {
             if (System.CheckInitialised(root, context))
@@ -56,12 +62,18 @@ namespace wtk
                     group p by new {p.Part, p.Chapter}
                     into grp
                     select new ChapterMetadata {Part = grp.Key.Part, 
-                Chapter = grp.Key.Chapter, Words = grp.Sum(p => p.Words)};
-                var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter);
+                    Chapter = grp.Key.Chapter, Words = grp.Sum(p => p.Words), 
+                    Path = Path.GetDirectoryName(grp.FirstOrDefault().FullPath)};
+                var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter).ToList();
 
+                foreach (var c in sortedChapters)
+                {
+                    var path = c.Path + @"\synopsis.md";
+                    GetSpecialValuesFromSynopsis(path, c); 
+                }
                 foreach(var c in sortedChapters)
                 {
-                    context.Console.Out.Write($"part {c.Part} chapter {c.Chapter}\t{c.Words} words\n");
+                    context.Console.Out.Write($"part {c.Part} chapter {c.Chapter}\t{c.Words}/{c.TargetWords} words\t{c.Synopsis}\n");
                 }
 
                 var wordcount = sortedChapters.Sum(m => m.Words);
@@ -247,8 +259,27 @@ namespace wtk
         private static List<String> GetTodoItemsFromFile(string pathAndFileName)
         {
             var contents = File.ReadAllLines(pathAndFileName);
-            var todoLines = contents.Where(line => line.Contains("TODO"));
+            var todoLines = contents.Where(line => line.Contains(CONTROL_TODO));
             return todoLines.ToList();
+        }
+
+        private static void GetSpecialValuesFromSynopsis(string pathAndFileName, ChapterMetadata chapter)
+        {
+            var result = "";
+            if (File.Exists(pathAndFileName))
+            {
+                var contents = File.ReadAllLines(pathAndFileName);
+                var synopsisLine = contents.Where(line => line.StartsWith(CONTROL_SYNOPSIS)).DefaultIfEmpty("").FirstOrDefault();
+                synopsisLine = synopsisLine.Replace(CONTROL_SYNOPSIS, "");
+                chapter.Synopsis = synopsisLine;
+                var targetWordCount = contents.Where(line => line.StartsWith(TARGET_WORDCOUNT)).FirstOrDefault();
+                int twc = 0;
+                if (!string.IsNullOrWhiteSpace(targetWordCount))
+                {   
+                    int.TryParse(targetWordCount.Replace(TARGET_WORDCOUNT, "").Trim(), out twc);
+                }
+                chapter.TargetWords = twc;
+            }
         }
         private static int CountWordsFromFile(string fileName)
         {

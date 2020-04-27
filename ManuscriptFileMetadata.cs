@@ -20,7 +20,9 @@ namespace wtk
         public int? Part {get;set;}
        public int? Chapter {get;set;}
         public int Words {get;set;}
-
+        public int TargetWords {get;set;}
+        public string Synopsis {get;set;}
+        public string Path {get;set;}
         public List<string> TodoItems {get;set;}
     }
 }

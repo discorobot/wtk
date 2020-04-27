@@ -48,6 +48,11 @@ SO:
 - each scene file has the form `NN_(anything you want).md`. Any markdown file in a chapter folder that doesnt' start with two numbers and an underscore won't be considered part of the novel when counting words or compiling
 - `synopsis.md` is a special file that can exist in any chapter folder and includes a summary of what should happen in the chapter. The synopsis file can include any text, but also supports a few special codes (see below)
 
+### synopsis.md codes
+The synopsis file can include any notes about the chapter where it resides. It is not included in the word count.
+Several special lines are supported. These can be displayed in summaries (or other places)
+
+
 
 # WTK commands
 
