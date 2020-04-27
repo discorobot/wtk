@@ -51,6 +51,8 @@ SO:
 ### synopsis.md codes
 The synopsis file can include any notes about the chapter where it resides. It is not included in the word count.
 Several special lines are supported. These can be displayed in summaries (or other places)
+- `SYNOPSIS` Gives a one-line synopsis of this chapter which will display when calling `status`
+- `TARGET_WORDCOUNT`Sets a target wordcount. This will be displayed with the actual wordcount when calling `status`
 
 
 
