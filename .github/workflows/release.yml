@@ -1,9 +1,13 @@
-name: build
-
-on: [push]
-
+name: Create Release  
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -24,5 +28,18 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with:
         name: published_linux
-        path: bin/Release/netcoreapp3.0/linux-x64/
-      
+        path: bin/Release/netcoreapp3.0/linux-x64/        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+          draft: true
+          prerelease: true
