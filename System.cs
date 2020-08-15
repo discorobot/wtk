@@ -2,11 +2,11 @@ using System.IO;
 using System.CommandLine.Invocation;
 namespace wtk
 {
-    public class System 
+    public class System
     {
         public  const string WTK_SYSTEM_DIR = ".wtk";
         public const string WC_LOG_FILE = "wc.log";
-        public const string MANUSCRIPT_DIR = "manuscript";    
+        public const string MANUSCRIPT_DIR = "manuscript";
 
         public static bool IsInitialised(string root)
         {

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,8 +7,8 @@ using System.CommandLine.Invocation;
 
 namespace wtk
 {
-    public class Commands
-    {        
+    public static class Commands
+    {
         private const string REGEX_MANUSCRIPT_FILE_MATCH = @"\d\d.*[.]md";
         private const string REGEX_CHAPTER_MATCH = @"((?>ch)|(?>ch_)|(?>chapter_))(?<chapter>\d\d)";
         private const string REGEX_PART_MATCH = @"((?>part)|(?>part_)|(?>section_))(?<part>\d\d)";
@@ -32,10 +31,11 @@ namespace wtk
                 context.ResultCode = (int)ExitCode.Success;
             }
         }
-      
 
         public static void Init(string root, bool verbose, InvocationContext context)
         {
+            if (verbose)
+                context.Console.Out.Write("Initialising...\n");
             var isInitialised = System.IsInitialised(root);
             if (isInitialised)
             {
@@ -57,6 +57,8 @@ namespace wtk
             var isInitialised = System.CheckInitialised(root, context);
             if (isInitialised)
             {
+                if (verbose)
+                    context.Console.Out.Write("Retrieving metadata...\n");
                 var allMetadata = GetAllMetadata(root);
                 var chapters = from p in allMetadata
                     group p by new {p.Part, p.Chapter}
@@ -69,7 +71,7 @@ namespace wtk
                 foreach (var c in sortedChapters)
                 {
                     var path = c.Path + @"\synopsis.md";
-                    GetSpecialValuesFromSynopsis(path, c); 
+                    GetSpecialValuesFromSynopsis(path, c);
                 }
                 foreach(var c in sortedChapters)
                 {
@@ -77,7 +79,7 @@ namespace wtk
                 }
 
                 var wordcount = sortedChapters.Sum(m => m.Words);
-                context.Console.Out.Write($"Total {wordcount} words\n\n");   
+                context.Console.Out.Write($"Total {wordcount} words\n\n");
             }
         }
         public static void Count(string root, bool verbose, InvocationContext context)
@@ -85,6 +87,8 @@ namespace wtk
             var isInitialised = System.CheckInitialised(root, context);
             if (isInitialised)
             {
+                if (verbose)
+                    context.Console.Out.Write("Counting...\n");
                 var wordcount = Count(root);
                 context.Console.Out.Write($"{wordcount} words");
             }
@@ -95,6 +99,8 @@ namespace wtk
             var isInitialised = System.CheckInitialised(root, context);
             if (isInitialised)
             {
+                if (verbose)
+                    context.Console.Out.Write("Count and keep...\n");
                 var wordcount = Count(root);
                 var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
                 var timestamp = DateTime.Now.ToString("O");
@@ -106,57 +112,59 @@ namespace wtk
 
         private static void LastEntriesFromKeepFile(string root, bool verbose, InvocationContext context)
         {
-            
+            if (verbose)
+                context.Console.Out.Write("Retrieving last entries from keepfile...\n");
             var fullPath = Path.Combine(root, System.WTK_SYSTEM_DIR, System.WC_LOG_FILE);
             if (File.Exists(fullPath))
             {
                 var keepEntries = File.ReadAllLines(fullPath);
-                var lastTen = keepEntries.Skip(Math.Max(0, keepEntries.Count() - 10));
+                var lastTen = keepEntries.Skip(Math.Max(0, keepEntries.Length - 10));
                 foreach (var s in lastTen)
                 {
                     context.Console.Out.Write($"{s}\n");
                 }
             }
         }
-        
         public static void Compile(string root, bool verbose, InvocationContext context)
         {
             var isInitialised = System.CheckInitialised(root, context);
             if (isInitialised)
             {
+                if (verbose)
+                    context.Console.Out.Write("Compiling...\n");
                 var configurationFile = Configuration.LoadConfiguration(root, context);
                 var outputPath = Path.Combine(root, COMPILE_OUTPUT_NAME);
                 var currentSection = 0;
                 var currentChapter = 0;
                 var metadata = GetAllMetadata(root);
-                
-                using (StreamWriter outputFile = new StreamWriter(outputPath))
+
+                using StreamWriter outputFile = new StreamWriter(outputPath);
+                foreach (var md in metadata)
                 {
-                    foreach (var md in metadata)
+                    if (md.Part != currentSection)
                     {
-                        if (md.Part != currentSection)
-                        {
-                            outputFile.WriteLine(string.Format(configurationFile.Compile.SectionBreak, md.Part));
-                            currentSection = md.Part.Value;
-                        }
-                        if (md.Chapter != currentChapter)
-                        {
-                            outputFile.WriteLine(string.Format(configurationFile.Compile.ChapterBreak, md.Chapter));
-                            currentChapter = md.Chapter.Value;
-                        }   
-                        var fileContents = LoadFileContents(md.FullPath);
-                        outputFile.Write(fileContents);
-                        outputFile.Write(configurationFile.Compile.PartBreak);
+                        outputFile.WriteLine(string.Format(configurationFile.Compile.SectionBreak, md.Part));
+                        currentSection = md.Part.Value;
                     }
+                    if (md.Chapter != currentChapter)
+                    {
+                        outputFile.WriteLine(string.Format(configurationFile.Compile.ChapterBreak, md.Chapter));
+                        currentChapter = md.Chapter.Value;
+                    }
+                    var fileContents = LoadFileContents(md.FullPath);
+                    outputFile.Write(fileContents);
+                    outputFile.Write(configurationFile.Compile.PartBreak);
                 }
             }
         }
 
-        public static void Todo(string root, bool vebose, InvocationContext context)
+        public static void Todo(string root, bool verbose, InvocationContext context)
         {
              var isInitialised = System.CheckInitialised(root, context);
             if (isInitialised)
             {
+                if (verbose)
+                    context.Console.Out.Write("Looking for todo items...\n");
                 var allMetadata = GetAllTodoItems(root);
                 var chapters = from p in allMetadata
                     group p by new {p.Part, p.Chapter}
@@ -181,7 +189,6 @@ namespace wtk
                         {
                             context.Console.Out.Write("\n");
                         }
-                        
                         foreach(var todo in c.TodoItems)
                         {
                             context.Console.Out.Write($"\t{todo}\n");
@@ -194,8 +201,7 @@ namespace wtk
         private static int Count(string root)
         {
             var allMetadata = GetAllMetadata(root);
-            var wordcount = allMetadata.Sum(m => m.Words);
-            return wordcount;
+            return allMetadata.Sum(m => m.Words);
         }
         private static List<PartFileMetadata> GetAllMetadata(string root)
         {
@@ -204,12 +210,11 @@ namespace wtk
             var manuscriptDir = new DirectoryInfo(Path.Combine(root, System.MANUSCRIPT_DIR));
             // only looking for markdown files that start with a number
             var allFiles = manuscriptDir.GetFiles("*.md", SearchOption.AllDirectories);
-            
             var justManuscriptFiles = allFiles.Where(f => Regex.IsMatch(f.Name,  REGEX_MANUSCRIPT_FILE_MATCH));
             foreach(FileInfo file in justManuscriptFiles)
             {
-                var metadata = GetPartFileMetadata(file.FullName);  
-                result.Add(metadata);  
+                var metadata = GetPartFileMetadata(file.FullName);
+                result.Add(metadata);
             }
             return result;
         }
@@ -223,12 +228,11 @@ namespace wtk
             var allFiles = manuscriptDir.GetFiles("*.md", SearchOption.AllDirectories);
             foreach(FileInfo file in allFiles)
             {
-                var metadata = GetPartFileTodoItems(file.FullName);  
-                result.Add(metadata);  
+                var metadata = GetPartFileTodoItems(file.FullName);
+                result.Add(metadata);
             }
             return result;
         }
-
 
         private static PartFileMetadata GetPartFileMetadata(string pathAndFileName)
         {
@@ -265,17 +269,16 @@ namespace wtk
 
         private static void GetSpecialValuesFromSynopsis(string pathAndFileName, ChapterMetadata chapter)
         {
-            var result = "";
             if (File.Exists(pathAndFileName))
             {
                 var contents = File.ReadAllLines(pathAndFileName);
                 var synopsisLine = contents.Where(line => line.StartsWith(CONTROL_SYNOPSIS)).DefaultIfEmpty("").FirstOrDefault();
                 synopsisLine = synopsisLine.Replace(CONTROL_SYNOPSIS, "");
                 chapter.Synopsis = synopsisLine;
-                var targetWordCount = contents.Where(line => line.StartsWith(TARGET_WORDCOUNT)).FirstOrDefault();
+                var targetWordCount = Array.Find(contents, line => line.StartsWith(TARGET_WORDCOUNT));
                 int twc = 0;
                 if (!string.IsNullOrWhiteSpace(targetWordCount))
-                {   
+                {
                     int.TryParse(targetWordCount.Replace(TARGET_WORDCOUNT, "").Trim(), out twc);
                 }
                 chapter.TargetWords = twc;
@@ -293,12 +296,11 @@ namespace wtk
             var s = File.ReadAllText(fileName);
             return s;
         }
-        
         private static int? GetChapterFromPath(string path)
         {
             var groups = Regex.Match(path, REGEX_CHAPTER_MATCH).Groups;
             var result = groups.Values.LastOrDefault().Value;
-            return ToNullableInt(result);    
+            return ToNullableInt(result);
         }
 
         private static int? GetPartFromPath(string path)
@@ -310,11 +312,7 @@ namespace wtk
 
         private static int? ToNullableInt(string s)
         {
-            int tempNumber;
-            return (int.TryParse(s.Trim(), out tempNumber) ? tempNumber as int? : null);
+            return (int.TryParse(s.Trim(), out int tempNumber) ? tempNumber as int? : null);
         }
-
     }
-
-
 }

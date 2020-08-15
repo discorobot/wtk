@@ -1,8 +1,8 @@
 namespace wtk 
 {
-    public class ConfigurationFile 
+    public class ConfigurationFile
     {
-        public Compile Compile {get;set;}              
+        public Compile Compile {get;set;}
     }
 
     public class Compile

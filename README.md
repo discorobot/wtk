@@ -6,7 +6,7 @@ This is a minimal collection of tools designed to help writers who like to work 
 
 It works best when paired with a programmer's editor and source control.
 
-I've designed wtk to match the way I like to work. These tools are opinonated and definitely not for everyone. But iIf you're writing a novel with some kind of plain text editor and the command-line is your happy place, these may be the tools for you.
+I've designed wtk to match the way I like to work. These tools are opinonated and definitely not for everyone. But If you're writing a novel with some kind of plain text editor and the command-line is your happy place, these may be the tools for you.
 
 
 
@@ -99,16 +99,5 @@ Files in the `.wtk` folder include
 
 - `config.json` The configuration file
 
-### Work in progress
-- [x] Implement init
-- [x] Implement count
-- [x] Implement count ch
-- [x] Implement count keep
-- [x] Implement config list
-- [x] Implement status
-- [x] Implement todo
-- [x] Implement compile
-- [x] Github build
-- [x] Create build artifacts 
-- [ ] Create releases
+
  
