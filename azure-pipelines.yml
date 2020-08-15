@@ -20,6 +20,7 @@ steps:
 
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'publish'
+    command: 'build'
+    projects: '**/*.csproj'
     publishWebProjects: false
     
