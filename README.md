@@ -1,6 +1,6 @@
 # Writer's Toolkit (WTK)
 
-https://discorobot.visualstudio.com/wtk/_apis/build/status/discorobot.wtk?branchName=master
+![build status](https://discorobot.visualstudio.com/wtk/_apis/build/status/discorobot.wtk?branchName=master)
 
 
 This is a minimal collection of tools designed to help writers who like to work with words the same way they work with source code.
