@@ -86,7 +86,7 @@ namespace wtk
             {
                 Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Compile)
             };
-            return cmd; 
+            return cmd;
         }
         private static Command Config()
         {
