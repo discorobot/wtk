@@ -1,6 +1,6 @@
 # Writer's Toolkit (WTK)
 
-![.NET Core](https://github.com/discorobot/wtk/workflows/.NET%20Core/badge.svg)
+[![Build Status](https://discorobot.visualstudio.com/wtk/_apis/build/status/discorobot.wtk?branchName=master)](https://discorobot.visualstudio.com/wtk/_build/latest?definitionId=1&branchName=master)
 
 This is a minimal collection of tools designed to help writers who like to work with words the same way they work with source code.
 
