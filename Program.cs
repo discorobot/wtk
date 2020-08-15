@@ -14,12 +14,12 @@ namespace wtk
         {
             var rootOption = new Option("--root", "The location of the project folder. Defaults to current directory.")
             {
-                Argument = new Argument<string>(defaultValue: () => Directory.GetCurrentDirectory())
+                Argument = new Argument<string>(getDefaultValue: () => Directory.GetCurrentDirectory())
             };
 
             var verboseOption = new Option("--verbose", "wtk tries to be silent unless you're in verbose mode.")
             {
-                Argument = new Argument<bool>(defaultValue: () => false)
+                Argument = new Argument<bool>(getDefaultValue: () => false)
             };
 
             var rootCommand = new RootCommand("A bunch of useful writing tools");
