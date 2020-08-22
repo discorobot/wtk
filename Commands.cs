@@ -144,12 +144,18 @@ namespace wtk
                     if (md.Part != currentSection)
                     {
                         outputFile.WriteLine(string.Format(configurationFile.Compile.SectionBreak, md.Part));
-                        currentSection = md.Part.Value;
+                        if (md.Part != null)
+                        {
+                            currentSection = md.Part.Value;
+                        }
                     }
                     if (md.Chapter != currentChapter)
                     {
                         outputFile.WriteLine(string.Format(configurationFile.Compile.ChapterBreak, md.Chapter));
-                        currentChapter = md.Chapter.Value;
+                        if (md.Chapter != null)
+                        {
+                            currentChapter = md.Chapter.Value;
+                        }
                     }
                     var fileContents = LoadFileContents(md.FullPath);
                     outputFile.Write(fileContents);
