@@ -18,7 +18,7 @@ namespace wtk
 
         private const string CONTROL_SYNOPSIS = "SYNOPSIS";
 
-        private const string TARGET_WORDCOUNT = "TARGET_WORDCOUNT"; 
+        private const string TARGET_WORDCOUNT = "TARGET_WORDCOUNT";
 
         static public void Status(string root, bool verbose, InvocationContext context)
         {
@@ -63,7 +63,7 @@ namespace wtk
                 var chapters = from p in allMetadata
                     group p by new {p.Part, p.Chapter}
                     into grp
-                    select new ChapterMetadata {Part = grp.Key.Part, 
+                    select new ChapterMetadata {Part = grp.Key.Part,
                     Chapter = grp.Key.Chapter, Words = grp.Sum(p => p.Words), 
                     Path = Path.GetDirectoryName(grp.FirstOrDefault().FullPath)};
                 var sortedChapters = chapters.OrderBy(c => c.Part).ThenBy(c => c.Chapter).ToList();
@@ -119,9 +119,14 @@ namespace wtk
             {
                 var keepEntries = File.ReadAllLines(fullPath);
                 var lastTen = keepEntries.Skip(Math.Max(0, keepEntries.Length - 10));
-                foreach (var s in lastTen)
+                var lastTenAsStatusItems = lastTen.Select(i => StatusItem.Parse(i));
+                var startCount = 0;
+
+                foreach (var s in lastTenAsStatusItems)
                 {
-                    context.Console.Out.Write($"{s}\n");
+                    var delta = s.WordCount - startCount;
+                    context.Console.Out.Write($"{s.LogDate:g}\t{s.WordCount}\t{delta:+#;-#;0}\n");
+                    startCount = s.WordCount;
                 }
             }
         }
@@ -185,11 +190,11 @@ namespace wtk
                     {
                         if(c.Part != null)
                         {
-                            context.Console.Out.Write($"part {c.Part} "); 
+                            context.Console.Out.Write($"part {c.Part} ");
                         }
                         if (c.Chapter != null)
                         {
-                            context.Console.Out.Write($"chapter {c.Chapter}"); 
+                            context.Console.Out.Write($"chapter {c.Chapter}");
                         }
                         if (c.Part != null || c.Chapter != null)
                         {
