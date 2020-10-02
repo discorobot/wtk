@@ -36,7 +36,7 @@ namespace wtk
 
         private static Command Init()
         {
-            var cmd = new Command("init", "Initialises a folder for use with gtk")
+            var cmd = new Command("init", "Initialises a folder for use with wtk")
             {
                 Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Init)
             };
