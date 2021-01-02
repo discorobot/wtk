@@ -73,7 +73,7 @@ namespace wtk
 
         private static Command Todo()
         {
-            var cmd = new Command("todo", "Displays all TODO items in the projrct")
+            var cmd = new Command("todo", "Displays all TODO items in the project")
             {
                 Handler = CommandHandler.Create<string, bool, InvocationContext>(Commands.Todo)
             };

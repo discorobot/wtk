@@ -148,7 +148,7 @@ namespace wtk
                 {
                     if (md.Part != currentSection)
                     {
-                        outputFile.WriteLine(string.Format(configurationFile.Compile.SectionBreak, md.Part));
+                        WriteSectionBreakIfRequired(outputFile, configurationFile.Compile.SectionBreak, md.Part);
                         if (md.Part != null)
                         {
                             currentSection = md.Part.Value;
@@ -156,7 +156,7 @@ namespace wtk
                     }
                     if (md.Chapter != currentChapter)
                     {
-                        outputFile.WriteLine(string.Format(configurationFile.Compile.ChapterBreak, md.Chapter));
+                        WriteChapterBreakIfRequired(outputFile, configurationFile.Compile.ChapterBreak, md.Chapter);
                         if (md.Chapter != null)
                         {
                             currentChapter = md.Chapter.Value;
@@ -169,9 +169,21 @@ namespace wtk
             }
         }
 
+        private static void WriteSectionBreakIfRequired(StreamWriter outputFile, string sectionBreakFormat, int? part)
+        {
+            if (part != null)
+                outputFile.WriteLine(string.Format(sectionBreakFormat, part));
+        }
+
+        private static void WriteChapterBreakIfRequired(StreamWriter outputFile, string chapterBreakFormat, int? chapter)
+        {
+            if (chapter != null)
+                 outputFile.WriteLine(string.Format(chapterBreakFormat, chapter));
+        }
+
         public static void Todo(string root, bool verbose, InvocationContext context)
         {
-             var isInitialised = System.CheckInitialised(root, context);
+            var isInitialised = System.CheckInitialised(root, context);
             if (isInitialised)
             {
                 if (verbose)
